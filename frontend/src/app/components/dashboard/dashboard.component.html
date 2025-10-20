@@ -1,0 +1,98 @@
+<div class="container">
+  <h1 class="page-title">Dashboard</h1>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="text-center">
+    <p>Loading dashboard...</p>
+  </div>
+
+  <div *ngIf="!loading">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>{{ stats.totalCustomers }}</h3>
+          <p>Total Customers</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>{{ stats.totalOrders }}</h3>
+          <p>Total Orders</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>{{ stats.pendingOrders }}</h3>
+          <p>Pending Orders</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>{{ stats.inProgressOrders }}</h3>
+          <p>In Progress</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>{{ stats.readyOrders }}</h3>
+          <p>Ready for Delivery</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>{{ stats.totalRevenue | number:'1.2-2' }}</h3>
+          <p>Total Revenue</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>{{ stats.pendingPayments | number:'1.2-2' }}</h3>
+          <p>Pending Payments</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-20">
+      <h2>Recent Orders</h2>
+      <table *ngIf="paginatedOrders.length > 0">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Order Date</th>
+            <th>Delivery Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of paginatedOrders">
+            <td>#{{ order.id }}</td>
+            <td>{{ order.customer_name }}</td>
+            <td>{{ order.order_date | date:'dd/MM/yyyy' }}</td>
+            <td>{{ order.delivery_date | date:'dd/MM/yyyy' }}</td>
+            <td>₹{{ order.total_amount | number:'1.2-2' }}</td>
+            <td>
+              <span class="badge badge-{{ order.status }}">{{ order.status }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="recentOrders.length > 0" class="pagination">
+        <button (click)="previousPage()" [disabled]="currentPage === 1">← Previous</button>
+        <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages">Next →</button>
+      </div>
+
+      <p *ngIf="recentOrders.length === 0" class="text-center">No recent orders</p>
+    </div>
+  </div>
+</div>

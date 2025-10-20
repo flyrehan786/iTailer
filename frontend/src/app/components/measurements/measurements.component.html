@@ -1,0 +1,182 @@
+<div class="container">
+  <div class="flex-between mb-20">
+    <div>
+      <button class="btn btn-secondary" (click)="goBack()">← Back to Customers</button>
+      <h1 class="page-title" style="margin-top: 10px;">Measurements for {{ customer?.name }}</h1>
+    </div>
+    <button class="btn btn-primary" (click)="openAddModal()">+ Add Measurement</button>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="text-center">
+    <p>Loading measurements...</p>
+  </div>
+
+  <div *ngIf="!loading" class="measurements-grid">
+    <div *ngFor="let measurement of measurements" class="measurement-card">
+      <div class="measurement-header">
+        <h3>{{ measurement.measurement_type | uppercase }}</h3>
+        <div class="action-buttons">
+          <button class="btn btn-sm btn-secondary" (click)="openEditModal(measurement)">Edit</button>
+          <button class="btn btn-sm btn-danger" (click)="deleteMeasurement(measurement.id)">Delete</button>
+        </div>
+      </div>
+
+      <div class="measurement-details">
+        <div *ngIf="measurement.chest" class="detail-item">
+          <span class="label">Chest:</span>
+          <span class="value">{{ measurement.chest }}"</span>
+        </div>
+        <div *ngIf="measurement.waist" class="detail-item">
+          <span class="label">Waist:</span>
+          <span class="value">{{ measurement.waist }}"</span>
+        </div>
+        <div *ngIf="measurement.shoulder" class="detail-item">
+          <span class="label">Shoulder:</span>
+          <span class="value">{{ measurement.shoulder }}"</span>
+        </div>
+        <div *ngIf="measurement.sleeve_length" class="detail-item">
+          <span class="label">Sleeve Length:</span>
+          <span class="value">{{ measurement.sleeve_length }}"</span>
+        </div>
+        <div *ngIf="measurement.shirt_length" class="detail-item">
+          <span class="label">Shirt Length:</span>
+          <span class="value">{{ measurement.shirt_length }}"</span>
+        </div>
+        <div *ngIf="measurement.neck" class="detail-item">
+          <span class="label">Neck:</span>
+          <span class="value">{{ measurement.neck }}"</span>
+        </div>
+        <div *ngIf="measurement.pant_length" class="detail-item">
+          <span class="label">Pant Length:</span>
+          <span class="value">{{ measurement.pant_length }}"</span>
+        </div>
+        <div *ngIf="measurement.pant_waist" class="detail-item">
+          <span class="label">Pant Waist:</span>
+          <span class="value">{{ measurement.pant_waist }}"</span>
+        </div>
+        <div *ngIf="measurement.hip" class="detail-item">
+          <span class="label">Hip:</span>
+          <span class="value">{{ measurement.hip }}"</span>
+        </div>
+        <div *ngIf="measurement.thigh" class="detail-item">
+          <span class="label">Thigh:</span>
+          <span class="value">{{ measurement.thigh }}"</span>
+        </div>
+        <div *ngIf="measurement.knee" class="detail-item">
+          <span class="label">Knee:</span>
+          <span class="value">{{ measurement.knee }}"</span>
+        </div>
+        <div *ngIf="measurement.bottom" class="detail-item">
+          <span class="label">Bottom:</span>
+          <span class="value">{{ measurement.bottom }}"</span>
+        </div>
+        <div *ngIf="measurement.notes" class="detail-item full-width">
+          <span class="label">Notes:</span>
+          <span class="value">{{ measurement.notes }}</span>
+        </div>
+      </div>
+
+      <div class="measurement-footer">
+        <small>Created: {{ measurement.created_at | date:'dd/MM/yyyy' }}</small>
+      </div>
+    </div>
+
+    <p *ngIf="measurements.length === 0" class="text-center">No measurements found. Add one to get started.</p>
+  </div>
+</div>
+
+<!-- Measurement Modal -->
+<div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+  <div class="modal modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ isEditMode ? 'Edit Measurement' : 'Add Measurement' }}</h2>
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+
+    <form (ngSubmit)="saveMeasurement()">
+      <div class="form-group">
+        <label>Measurement Type *</label>
+        <select class="form-control" [(ngModel)]="measurementForm.measurement_type" name="measurement_type" required>
+          <option value="shirt">Shirt</option>
+          <option value="pant">Pant</option>
+          <option value="suit">Suit</option>
+          <option value="kurta">Kurta</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div *ngIf="isShirtType()">
+        <h3 class="section-title">Shirt/Kurta Measurements</h3>
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label>Chest (inches)</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="measurementForm.chest" name="chest" />
+          </div>
+          <div class="form-group">
+            <label>Waist (inches)</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="measurementForm.waist" name="waist" />
+          </div>
+          <div class="form-group">
+            <label>Shoulder (inches)</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="measurementForm.shoulder" name="shoulder" />
+          </div>
+          <div class="form-group">
+            <label>Sleeve Length (inches)</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="measurementForm.sleeve_length" name="sleeve_length" />
+          </div>
+          <div class="form-group">
+            <label>Shirt Length (inches)</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="measurementForm.shirt_length" name="shirt_length" />
+          </div>
+          <div class="form-group">
+            <label>Neck (inches)</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="measurementForm.neck" name="neck" />
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="isPantType()">
+        <h3 class="section-title">Pant Measurements</h3>
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label>Pant Length (inches)</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="measurementForm.pant_length" name="pant_length" />
+          </div>
+          <div class="form-group">
+            <label>Pant Waist (inches)</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="measurementForm.pant_waist" name="pant_waist" />
+          </div>
+          <div class="form-group">
+            <label>Hip (inches)</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="measurementForm.hip" name="hip" />
+          </div>
+          <div class="form-group">
+            <label>Thigh (inches)</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="measurementForm.thigh" name="thigh" />
+          </div>
+          <div class="form-group">
+            <label>Knee (inches)</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="measurementForm.knee" name="knee" />
+          </div>
+          <div class="form-group">
+            <label>Bottom (inches)</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="measurementForm.bottom" name="bottom" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea class="form-control" [(ngModel)]="measurementForm.notes" name="notes" rows="3"></textarea>
+      </div>
+
+      <div class="flex flex-gap mt-20">
+        <button type="submit" class="btn btn-primary">{{ isEditMode ? 'Update' : 'Create' }}</button>
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

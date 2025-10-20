@@ -1,0 +1,49 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>TSystem</h1>
+      <p>Tailor Management System</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      <h2>Login</h2>
+
+      <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+      <div class="form-group">
+        <label>Username or Email</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="loginForm.username"
+          name="username"
+          placeholder="Enter your username or email"
+          required
+          [disabled]="loading"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          type="password"
+          class="form-control"
+          [(ngModel)]="loginForm.password"
+          name="password"
+          placeholder="Enter your password"
+          required
+          [disabled]="loading"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="loading">
+        <span *ngIf="!loading">Login</span>
+        <span *ngIf="loading">Logging in...</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>Default credentials: <strong>admin</strong> / <strong>admin123</strong></p>
+    </div>
+  </div>
+</div>

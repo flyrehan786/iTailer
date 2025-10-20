@@ -1,0 +1,88 @@
+<div class="container">
+  <h1 class="page-title">My Profile</h1>
+
+  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="text-center">
+    <p>Loading profile...</p>
+  </div>
+
+  <div *ngIf="!loading" class="profile-container">
+    <div class="card profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <div class="avatar-circle">{{ user.full_name?.charAt(0) || user.username?.charAt(0) || 'U' }}</div>
+        </div>
+        <div class="profile-info">
+          <h2>{{ user.full_name || user.username }}</h2>
+          <p class="role-badge">{{ user.role || 'User' }}</p>
+        </div>
+      </div>
+
+      <form (ngSubmit)="updateProfile()" class="profile-form">
+        <h3>Profile Information</h3>
+        
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label>Username *</label>
+            <input type="text" class="form-control" [(ngModel)]="profileForm.username" name="username" required />
+          </div>
+
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" class="form-control" [(ngModel)]="profileForm.email" name="email" required />
+          </div>
+
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" class="form-control" [(ngModel)]="profileForm.full_name" name="full_name" />
+          </div>
+
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" class="form-control" [(ngModel)]="profileForm.phone" name="phone" />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Update Profile</button>
+          <button type="button" class="btn btn-secondary" (click)="openPasswordModal()">Change Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div *ngIf="showPasswordModal" class="modal-overlay" (click)="closePasswordModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Change Password</h2>
+      <button class="close-btn" (click)="closePasswordModal()">&times;</button>
+    </div>
+
+    <form (ngSubmit)="changePassword()">
+      <div class="form-group">
+        <label>Current Password *</label>
+        <input type="password" class="form-control" [(ngModel)]="passwordForm.current_password" name="current_password" required />
+      </div>
+
+      <div class="form-group">
+        <label>New Password *</label>
+        <input type="password" class="form-control" [(ngModel)]="passwordForm.new_password" name="new_password" required />
+        <small>Minimum 6 characters</small>
+      </div>
+
+      <div class="form-group">
+        <label>Confirm New Password *</label>
+        <input type="password" class="form-control" [(ngModel)]="passwordForm.confirm_password" name="confirm_password" required />
+      </div>
+
+      <div class="flex flex-gap mt-20">
+        <button type="submit" class="btn btn-primary">Change Password</button>
+        <button type="button" class="btn btn-secondary" (click)="closePasswordModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

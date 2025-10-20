@@ -1,0 +1,281 @@
+<div class="container">
+  <div class="flex-between mb-20">
+    <h1 class="page-title">Orders</h1>
+    <button class="btn btn-primary" (click)="openAddModal()">+ Create Order</button>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="text-center">
+    <p>Loading orders...</p>
+  </div>
+
+  <div *ngIf="!loading" class="card">
+    <div class="search-filter-row">
+      <input
+        type="text"
+        class="form-control search-input"
+        placeholder="Search by order ID, customer name..."
+        [(ngModel)]="searchQuery"
+        (input)="applyFilters()"
+      />
+      
+      <select class="form-control filter-select" [(ngModel)]="statusFilter" (change)="applyFilters()">
+        <option value="">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="in_progress">In Progress</option>
+        <option value="ready">Ready</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+
+      <select class="form-control filter-select" [(ngModel)]="paymentFilter" (change)="applyFilters()">
+        <option value="">All Payments</option>
+        <option value="paid">Fully Paid</option>
+        <option value="pending">Payment Pending</option>
+      </select>
+
+      <input
+        type="date"
+        class="form-control filter-select"
+        placeholder="From Date"
+        [(ngModel)]="dateFromFilter"
+        (change)="applyFilters()"
+      />
+
+      <input
+        type="date"
+        class="form-control filter-select"
+        placeholder="To Date"
+        [(ngModel)]="dateToFilter"
+        (change)="applyFilters()"
+      />
+
+      <button class="btn btn-secondary" (click)="clearFilters()">Clear</button>
+    </div>
+
+    <table *ngIf="paginatedOrders.length > 0">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Order Date</th>
+          <th>Delivery Date</th>
+          <th>Total</th>
+          <th>Paid</th>
+          <th>Remaining</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of paginatedOrders">
+          <td>#{{ order.id }}</td>
+          <td>{{ order.customer_name }}</td>
+          <td>{{ order.order_date | date:'dd/MM/yyyy' }}</td>
+          <td>{{ order.delivery_date | date:'dd/MM/yyyy' }}</td>
+          <td>₹{{ order.total_amount | number:'1.2-2' }}</td>
+          <td>₹{{ order.advance_payment | number:'1.2-2' }}</td>
+          <td>₹{{ order.remaining_payment | number:'1.2-2' }}</td>
+          <td>
+            <select class="status-select badge-{{ order.status }}" [(ngModel)]="order.status" (change)="updateStatus(order.id, order.status)">
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="ready">Ready</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn btn-sm btn-secondary" (click)="openEditModal(order)">Edit</button>
+              <button class="btn btn-sm btn-warning" (click)="openPaymentModal(order)" *ngIf="order.remaining_payment > 0">Add Payment</button>
+              <button class="btn btn-sm btn-danger" (click)="deleteOrder(order.id)">Delete</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredOrders.length > 0" class="pagination">
+      <button (click)="previousPage()" [disabled]="currentPage === 1">← Previous</button>
+      <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages">Next →</button>
+    </div>
+
+    <p *ngIf="filteredOrders.length === 0" class="text-center">No orders found</p>
+  </div>
+</div>
+
+<!-- Order Modal -->
+<div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+  <div class="modal modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ isEditMode ? 'Edit Order' : 'Create Order' }}</h2>
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+
+    <form (ngSubmit)="saveOrder()">
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label>Customer *</label>
+          <select class="form-control" [(ngModel)]="orderForm.customer_id" name="customer_id" (change)="onCustomerChange()" required>
+            <option [ngValue]="null">Select Customer</option>
+            <option *ngFor="let customer of customers" [ngValue]="customer.id">{{ customer.name }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" [(ngModel)]="orderForm.status" name="status">
+            <option value="pending">Pending</option>
+            <option value="in_progress">In Progress</option>
+            <option value="ready">Ready</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Order Date *</label>
+          <input type="date" class="form-control" [(ngModel)]="orderForm.order_date" name="order_date" required />
+        </div>
+
+        <div class="form-group">
+          <label>Delivery Date</label>
+          <input type="date" class="form-control" [(ngModel)]="orderForm.delivery_date" name="delivery_date" />
+        </div>
+
+        <div class="form-group">
+          <label>Advance Payment</label>
+          <input type="number" step="0.01" class="form-control" [(ngModel)]="orderForm.advance_payment" name="advance_payment" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea class="form-control" [(ngModel)]="orderForm.notes" name="notes" rows="2"></textarea>
+      </div>
+
+      <h3 class="section-title">Order Items</h3>
+      
+      <div *ngFor="let item of orderForm.items; let i = index" class="item-section">
+        <div class="item-header">
+          <h4>Item {{ i + 1 }}</h4>
+          <button type="button" class="btn btn-sm btn-danger" (click)="removeItem(i)" *ngIf="orderForm.items.length > 1">Remove</button>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label>Item Type *</label>
+            <select class="form-control" [(ngModel)]="item.item_type" [name]="'item_type_' + i">
+              <option value="shirt">Shirt</option>
+              <option value="pant">Pant</option>
+              <option value="suit">Suit</option>
+              <option value="kurta">Kurta</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Measurement</label>
+            <select class="form-control" [(ngModel)]="item.measurement_id" [name]="'measurement_id_' + i">
+              <option [ngValue]="null">No Measurement</option>
+              <option *ngFor="let measurement of measurements" [ngValue]="measurement.id">
+                {{ measurement.measurement_type | uppercase }} - {{ measurement.created_at | date:'dd/MM/yyyy' }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" class="form-control" [(ngModel)]="item.quantity" [name]="'quantity_' + i" min="1" />
+          </div>
+
+          <div class="form-group">
+            <label>Fabric Type</label>
+            <input type="text" class="form-control" [(ngModel)]="item.fabric_type" [name]="'fabric_type_' + i" />
+          </div>
+
+          <div class="form-group">
+            <label>Color</label>
+            <input type="text" class="form-control" [(ngModel)]="item.color" [name]="'color_' + i" />
+          </div>
+
+          <div class="form-group">
+            <label>Price *</label>
+            <input type="number" step="0.01" class="form-control" [(ngModel)]="item.price" [name]="'price_' + i" (input)="calculateTotal()" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Design Details</label>
+          <textarea class="form-control" [(ngModel)]="item.design_details" [name]="'design_details_' + i" rows="2"></textarea>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-secondary mb-20" (click)="addItem()">+ Add Item</button>
+
+      <div class="total-section">
+        <h3>Total Amount: ₹{{ orderForm.total_amount | number:'1.2-2' }}</h3>
+      </div>
+
+      <div class="flex flex-gap mt-20">
+        <button type="submit" class="btn btn-primary">{{ isEditMode ? 'Update Order' : 'Create Order' }}</button>
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div *ngIf="showPaymentModal" class="modal-overlay" (click)="closePaymentModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add Payment</h2>
+      <button class="close-btn" (click)="closePaymentModal()">&times;</button>
+    </div>
+
+    <div *ngIf="selectedOrder" class="payment-info">
+      <p><strong>Order ID:</strong> #{{ selectedOrder.id }}</p>
+      <p><strong>Customer:</strong> {{ selectedOrder.customer_name }}</p>
+      <p><strong>Total Amount:</strong> ₹{{ selectedOrder.total_amount | number:'1.2-2' }}</p>
+      <p><strong>Paid:</strong> ₹{{ selectedOrder.advance_payment | number:'1.2-2' }}</p>
+      <p><strong>Remaining:</strong> ₹{{ selectedOrder.remaining_payment | number:'1.2-2' }}</p>
+    </div>
+
+    <form (ngSubmit)="savePayment()">
+      <div class="form-group">
+        <label>Amount *</label>
+        <input type="number" step="0.01" class="form-control" [(ngModel)]="paymentForm.amount" name="amount" required />
+      </div>
+
+      <div class="form-group">
+        <label>Payment Date *</label>
+        <input type="date" class="form-control" [(ngModel)]="paymentForm.payment_date" name="payment_date" required />
+      </div>
+
+      <div class="form-group">
+        <label>Payment Method</label>
+        <select class="form-control" [(ngModel)]="paymentForm.payment_method" name="payment_method">
+          <option value="cash">Cash</option>
+          <option value="card">Card</option>
+          <option value="upi">UPI</option>
+          <option value="bank_transfer">Bank Transfer</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea class="form-control" [(ngModel)]="paymentForm.notes" name="notes" rows="2"></textarea>
+      </div>
+
+      <div class="flex flex-gap mt-20">
+        <button type="submit" class="btn btn-primary">Record Payment</button>
+        <button type="button" class="btn btn-secondary" (click)="closePaymentModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

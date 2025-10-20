@@ -1,0 +1,23 @@
+.page-title {
+  margin: 0;
+}
+
+.search-box {
+  margin-bottom: 20px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}

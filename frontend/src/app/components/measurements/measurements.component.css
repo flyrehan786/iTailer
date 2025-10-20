@@ -1,0 +1,85 @@
+.page-title {
+  margin: 0;
+}
+
+.measurements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.measurement-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.measurement-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.measurement-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.measurement-details {
+  padding: 15px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.detail-item.full-width {
+  grid-column: 1 / -1;
+  flex-direction: column;
+}
+
+.detail-item .label {
+  font-weight: 600;
+  color: #666;
+}
+
+.detail-item .value {
+  color: #333;
+}
+
+.measurement-footer {
+  padding: 10px 15px;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+.section-title {
+  margin: 20px 0 10px 0;
+  color: #667eea;
+  font-size: 16px;
+}
+
+.modal-large {
+  max-width: 800px;
+}
+
+@media (max-width: 768px) {
+  .measurements-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .measurement-details {
+    grid-template-columns: 1fr;
+  }
+}

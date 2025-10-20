@@ -1,0 +1,75 @@
+.page-title {
+  margin: 0;
+}
+
+.status-select {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.section-title {
+  margin: 20px 0 10px 0;
+  color: #667eea;
+  font-size: 16px;
+}
+
+.item-section {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.item-header h4 {
+  margin: 0;
+  color: #333;
+}
+
+.total-section {
+  background: #e8f5e9;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: right;
+}
+
+.total-section h3 {
+  margin: 0;
+  color: #2e7d32;
+}
+
+.payment-info {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.payment-info p {
+  margin: 5px 0;
+}
+
+.modal-large {
+  max-width: 900px;
+}
